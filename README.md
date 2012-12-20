@@ -20,7 +20,7 @@ Make sure to note down your **Consumer key**, **Consumer secret**, **Access toke
 
 ### Install Ruby Bundler
 
-This will require running some things on the command line. Open the Terminal (just type `Terminal` into Spotlight). Copy and paste this line into the tab that opens up and hit `Enter`:
+This will require running some things on the command line. Open the Terminal (just type `Terminal` into Spotlight). Copy and paste this line into the tab that opens and press `Enter`:
 
     sudo gem install bundler
 
@@ -36,7 +36,7 @@ Download your tweet archive from your Twitter settings page. Unzip the downloade
 
 ### Install shame-eraser
 
-Open the Terminal again. Copy and paste the following line into it and hit `Enter`:
+Open the Terminal again. Copy and paste the following line into it and press `Enter`:
 
     git clone https://github.com/benjaminjackson/shame-eraser.git && cd shame-eraser && bundle install && open lib
 
@@ -46,7 +46,7 @@ Still in the Terminal, copy and paste the following line into it:
 
     bundle exec ruby bin/eraser.rb
 
-Drag your tweets folder onto the Terminal. It should auto-complete the path to the folder. *Now* hit `Enter`.
+Drag your tweets folder onto the Terminal. It should auto-complete the path to the folder. *Now* press `Enter`.
 
 When the script runs it will ask for your consumer key, consumer secret, access token, and access token secret which you noted down earlier.
 
