@@ -13,10 +13,10 @@ A small Ruby script for erasing your shame on Twitter (i.e. your oldest tweets).
 First, you'll have to set up a Twitter app on the developer portal and generate an OAuth key.
 
 1. Visit the [Twitter Developer Apps](https://dev.twitter.com/apps) page and [create a new app](https://dev.twitter.com/apps/new), filling out only the required fields.
-2. Go to the **Settings** tab for your app, scroll down, and change **Application Type** to `Read and Write`. Click **Update this Twitter application's settings**.
-3. Go to the **Details** tab. Scroll down and click **Create my access token** (or **Recreate my access token** if you already created one). When you refresh, you should see "Access Level: Read and Write" after your access token and secret.
+2. Select the **Settings** tab for your app, scroll down, and change **Application Type** to `Read and Write`. Click **Update this Twitter application's settings**.
+3. Select the **Details** tab. Scroll down and click **Create my access token** (or **Recreate my access token** if you already created one). When you refresh, you should see "Access Level: Read and Write" after your access token and secret.
 
-Make sure to note down your **consumer key**, **consumer secret**, **access token**, and **access token secret**. You'll need them to run the script.
+Make sure to note down your **Consumer key**, **Consumer secret**, **Access token**, and **Access token secret**. You'll need them to run the script.
 
 ### Install Ruby Bundler
 
