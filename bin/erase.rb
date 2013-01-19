@@ -41,13 +41,16 @@ end
 TWEET_ARCHIVE_DIR = ARGV.shift
 
 if @opts[:number].nil?
-  puts "\nHow many of your early tweets would you like to delete? Enter a number, or 'date' to specify a date range."
-  @opts[:number] = gets.chomp
-  while @opts[:number].to_i <= 0 && @opts[:number] != "date"
+  puts "\nHow many of your early tweets would you like to delete?" 
+  puts "Enter a number, or 'date' to specify a date range." 
+  puts "For example, '50' will delete your first 50 tweets."
+  @opts[:number] = gets.chomp.strip
+  while @opts[:number].to_i <= 0 && !@opts[:number].to_s.include?("date")
     puts "Please specify a number greater than 0, or 'date'."
-    @opts[:number] = gets.chomp.to_i
+    @opts[:number] = gets.chomp.strip
   end
-  @opts[:number] = @opts[:number].to_i
+  @opts[:number] = "date" if @opts[:number].to_s.include?("date")
+  @opts[:number] = @opts[:number].to_i unless @opts[:number] == "date"
 end
 
 if @opts[:number] == "date"
@@ -55,8 +58,8 @@ if @opts[:number] == "date"
     if @opts[key].nil?
       while !@opts[key].is_a?(Date)
         begin
-          puts "\nWhat's the #{key == :"start-date" ? "start" : "end"} date? Example: 'a year ago', 'January 2009'"
-          @opts[key] = Chronic::parse(gets.chomp).to_date
+          puts "\nWhat's the #{key == :"start-date" ? "start" : "end"} date? Example: 'a year ago', 'January 2009'. Tweets #{key == :"start-date" ? "before" : "after"} this date will not be deleted."
+          @opts[key] = Date::parse(Chronic::parse(gets.chomp.strip).strftime("%Y-%m-%d"))
           puts "Great! That looks like #{@opts[key].to_s}."
         rescue
           puts "Error parsing date. Please try again."
@@ -80,7 +83,7 @@ def delete_tweets_in_file filepath
        (@opts[:number] == "date" && (@opts[:"start-date"]...@opts[:"end-date"]).include?(date))
       id = row[id_index]
       puts "Deleting tweet with ID #{id}"
-      # Twitter.status_destroy(id)
+      Twitter.status_destroy(id)
       @total_deleted += 1
     end
     if @opts[:number] != "date" && @total_deleted == @opts[:number]
@@ -93,13 +96,21 @@ end
 if @opts[:number] == "date"
 puts "\nThis action will PERMANENTLY delete your tweets for @#{Twitter.user.username} between #{@opts[:"start-date"]} and #{@opts[:"end-date"]}. Are you absolutely certain beyond a shadow of a doubt that you want to do this? There is no undo. (Y/n)"
 else
-  puts "\nThis action will PERMANENTLY delete your first #{@opts[:number]} tweets for @#{Twitter.user.username}. Are you absolutely certain beyond a shadow of a doubt that you want to do this? There is no undo. (Y/n)"
+  tweets_phrase = @opts[:number] > 1 ? "your first #{@opts[:number]} tweets" : "your first tweet"
+  puts "\nThis action will PERMANENTLY delete #{tweets_phrase} for @#{Twitter.user.username}. Are you absolutely certain beyond a shadow of a doubt that you want to do this? There is no undo. (Y/n)"
 end
-confirmation = gets.chomp
+confirmation = gets.chomp.strip
 
-if confirmation == "Y"
+if confirmation == "y"
+  puts "Is that a 'yes'? Just making sure."
+  confirmation = gets.chomp.strip
+end
+
+if confirmation == "Y" || confirmation == 'yes'
   puts "Deleting tweets..."
   Dir.glob(File.join(TWEET_ARCHIVE_DIR, "data", "csv", "*")).each do |filepath|
     delete_tweets_in_file(filepath)
   end
+else
+  puts "Canceling"
 end
