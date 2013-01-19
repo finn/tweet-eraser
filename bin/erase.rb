@@ -13,13 +13,13 @@ require 'lib_trollop'
 require 'config'
 
 p = Trollop::Parser.new do
-  
+
   version "shame-eraser 0.1 (c) 2012 Benjamin Jackson"
   banner <<-EOS
 
 shame-eraser 0.1 (c) 2012 Benjamin Jackson
 
-Shame Eraser is a small Ruby script for erasing your shame on Twitter (i.e., your oldest tweets). 
+Shame Eraser is a small Ruby script for erasing your shame on Twitter (i.e., your oldest tweets).
 
 Usage:
        erase.rb [options] <foldername>
@@ -30,7 +30,7 @@ EOS
 opt :"start-date", "Tweets before this date will not be deleted", :short => 's', :type => Date
 opt :"end-date", "Tweets after this date will not be deleted", :short => 'e', :type => Date
 opt :number, "Number of tweets to be deleted, starting from the first", :short => 'n', :type => Integer
-  
+
 end
 
 @opts = Trollop::with_standard_exception_handling p do
@@ -41,8 +41,8 @@ end
 TWEET_ARCHIVE_DIR = ARGV.shift
 
 if @opts[:number].nil?
-  puts "\nHow many of your early tweets would you like to delete?" 
-  puts "Enter a number, or 'date' to specify a date range." 
+  puts "\nHow many of your early tweets would you like to delete?"
+  puts "Enter a number, or 'date' to specify a date range."
   puts "For example, '50' will delete your first 50 tweets."
   @opts[:number] = gets.chomp.strip
   while @opts[:number].to_i <= 0 && !@opts[:number].to_s.include?("date")
@@ -79,7 +79,7 @@ def delete_tweets_in_file filepath
   # reverse so it's earliest tweets first
   lines[1..-1].reverse.each_with_index do |row, index|
     date = Date.parse(row[date_index])
-    if (@opts[:number] != "date" && @total_deleted < @opts[:number]) || 
+    if (@opts[:number] != "date" && @total_deleted < @opts[:number]) ||
        (@opts[:number] == "date" && (@opts[:"start-date"]...@opts[:"end-date"]).include?(date))
       id = row[id_index]
       puts "Deleting tweet with ID #{id}"
@@ -88,7 +88,7 @@ def delete_tweets_in_file filepath
     end
     if @opts[:number] != "date" && @total_deleted == @opts[:number]
       puts "Finished deleting #{@opts[:number]} tweets"
-      exit 
+      exit
     end
   end
 end
