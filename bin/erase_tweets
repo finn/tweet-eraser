@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require 'date'
 require 'csv'
 
@@ -82,9 +84,16 @@ def delete_tweets_in_file filepath
     if (@opts[:number] != "date" && @total_deleted < @opts[:number]) ||
        (@opts[:number] == "date" && (@opts[:"start-date"]...@opts[:"end-date"]).include?(date))
       id = row[id_index]
-      puts "Deleting tweet with ID #{id}"
-      Twitter.status_destroy(id)
-      @total_deleted += 1
+      begin
+            puts "Looking for tweet with ID #{id}"
+            Twitter.status(id)
+            puts "Deleting tweet with ID #{id}"
+            Twitter.status_destroy(id)
+            @total_deleted += 1
+      rescue
+        puts "Error finding/deleting tweet with ID #{id}"
+      end
+      sleep 1
     end
     if @opts[:number] != "date" && @total_deleted == @opts[:number]
       puts "Finished deleting #{@opts[:number]} tweets"

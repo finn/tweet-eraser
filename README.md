@@ -1,41 +1,68 @@
 # shame-eraser
 
-Now that Twitter has made it easy to download our entire tweet archives, the Internet is now faced with the scary reality that the dumbest things we've ever said are only a few clicks away. Our early tweets were sent from a time of innocence, joy, and freedom from the realization that one day other people (and we ourselves) might pass judgement on them.
+Now that Twitter has made it easy to download our entire tweet archives, the
+Internet is faced with the scary reality that the dumbest things we've ever
+said are only a few clicks away. Our early tweets were sent from a time of
+innocence, joy, and freedom from the realization that one day other people (and
+we ourselves) might pass judgement on them.
 
-But the time of reckoning has come. And if you're unable to bear the weight of your shame, this is your way out. Perhaps you had a particularly dark period after a break-up. Maybe your first six months on Twitter were just bad haikus. If you're the type of person who rips up your old shitty poems, this script is for you.
+But the time of reckoning has come. And if you're unable to bear the weight of
+your shame, this is your way out. Perhaps you had a particularly dark period
+after a break-up. Maybe your first six months on Twitter were just bad haikus.
+If you're the type of person who rips up your old shitty poems, this script is
+for you.
 
-**Important:** this should be obvious, but to be sure **there is no undo** for this script. If you haven't seen *Eternal Sunshine of the Spotless Mind*, you might want to watch it first. Weigh your options carefully before erasing your past. (You will, of course, still have your local archive after deleting the public tweets.)
+**Important:** this should be obvious, but to be sure **there is no undo** for
+this script. If you haven't seen *Eternal Sunshine of the Spotless Mind*, you
+might want to watch it first. Weigh your options carefully before erasing your
+past. (You will, of course, still have your local archive after deleting the
+public tweets.)
 
-### Author
+## Author
 
-[Benjamin Jackson](http://twitter.com/benjaminjackson)
+* [Benjamin Jackson](http://twitter.com/benjaminjackson)
+* [Finn Smith](http://twitter.com/finn)
 
-### Instructions:
+## Instructions:
 
-#### Set Up A Twitter App
+### Set Up A Twitter App
 
-First, you'll have to set up a Twitter app on the developer portal and generate an OAuth key.
+First, you'll have to set up a Twitter app on the developer portal and generate
+an OAuth key.
 
-1. Visit the [Twitter Developer Apps](https://dev.twitter.com/apps) page and [create a new app](https://dev.twitter.com/apps/new), filling out only the required fields.
-2. Go to the "Settings" tab for your app, scroll down, and change "Application Type" to "Read and Write", then click "Update this Twitter application's settings".
-3. Go to the "Details" tab, scroll down, and click "Create my access token" (or "Recreate my access token" if you already created one). When you refresh, you should see "Access Level: Read and Write" after your access token and secret.
+* Visit the [Twitter Developer Apps](https://dev.twitter.com/apps) page and
+  [create a new app](https://dev.twitter.com/apps/new). Fill out only the
+  required fields.
 
-#### Download Shame Eraser from Github
+* Go to the "Settings" tab for your app, scroll down, and change "Application
+  Type" to "Read and Write", then click "Update this Twitter application's
+  settings".
 
-Download [this archive](https://github.com/benjaminjackson/shame-eraser/archive/master.zip) and unzip it.
+* Go to the "Details" tab, scroll down, and click "Create my access token" (or
+  "Recreate my access token" if you already created one). When you refresh,
+  you should see "Access Level: Read and Write" after your access token and
+  secret.
 
-#### Delete Your Old Tweets
+### Set up the script
 
-Download your tweet archive and unzip it. Next, you'll have to run some things on the command line. Open the Terminal (just type "Terminal" into Spotlight), copy and paste this into the tab that opens up, and hit Enter:
+* Clone this repo.
 
-    cd ~/Downloads/shame-eraser-master && sudo gem install bundler && bundle install && open lib
+* cd into the repo dir.
 
-*Note: if you changed your default downloads folder, you'll need to change "~/Downloads" to the path to your downloads folder. You can get this by dragging the folder onto Terminal.*
+* Install the bundled gems locally:
 
-Now copy your consumer key, consumer secret, access token, and access token secret into lib/config.rb and then copy and paste this line *without* pressing Enter:
+    bundle install --path vendor
 
-    bundle exec ruby bin/erase.rb
+* Configure the script with your Twitter app authentication information. Edit
+  `lib/config.rb` and add your consumer key, consumer secret, access token, and
+  access token secret from dev.twitter.com
 
-Drag your tweets folder onto Terminal and it should auto-complete the path to the folder. *Now* hit Enter, and follow the instructions.
+### Delete Your Old Tweets
 
-Good luck, and enjoy your new shame-free life on Twitter.
+* Download your tweet archive from Twitter and unzip it. Note the patht the the
+  newly unzipped directory.
+
+* Using bundler, run the `erase_tweets` script from this repo, pointing it to
+  the path of your unzipped tweet archive directory:
+
+    bundle exec bin/erase_tweets /path/to/tweet/archive/dir
