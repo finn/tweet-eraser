@@ -1,125 +1,163 @@
 #!/usr/bin/env ruby
 
+# TODO objects
+# TODO error if no file path on command line
+# TODO validate path to archive dir first thing
+# TODO validate csv in archive dir second thing
+
 require 'date'
 require 'csv'
 
 require 'rubygems'
-require "bundler/setup"
+require 'bundler/setup'
 
 require 'twitter'
 require 'chronic'
+require 'word_wrapper'
+require 'trollop'
 
 $: << 'lib'
-
-require 'lib_trollop'
 require 'config'
 
 p = Trollop::Parser.new do
 
-  version "shame-eraser 0.1 (c) 2012 Benjamin Jackson"
+  version 'erase_tweets (Tweet Eraser) 0.2'
   banner <<-EOS
 
-shame-eraser 0.1 (c) 2012 Benjamin Jackson
+erase_tweets (Tweet Eraser) 0.2
 
-Shame Eraser is a small Ruby script for erasing your shame on Twitter (i.e., your oldest tweets).
+Tweet Eraser is a small Ruby script for erasing old tweets on Twitter (i.e.,
+your oldest tweets).
 
 Usage:
-       erase.rb [options] <foldername>
+    erase_tweets [options] <twitter archive path>
 
-You can run it without options and just follow the prompts, or specify them on the command line as follows:
+Run this erase_tweets without options and just follow the prompts, or specify
+them on the command line as follows:
 EOS
 
-opt :"start-date", "Tweets before this date will not be deleted", :short => 's', :type => Date
-opt :"end-date", "Tweets after this date will not be deleted", :short => 'e', :type => Date
-opt :number, "Number of tweets to be deleted, starting from the first", :short => 'n', :type => Integer
+#opt :start, 'Tweets before this date will not be deleted', :short => 's', :type => Date
+#opt :end, 'Tweets after this date will not be deleted', :short => 'e', :type => Date
+opt :number, 'The number of tweets to be deleted', :short => 'n', :type => Integer
 
 end
 
 @opts = Trollop::with_standard_exception_handling p do
-  raise Trollop::HelpNeeded if ARGV.empty? # show help screen
+  # show help screen
+  raise Trollop::HelpNeeded if ARGV.empty?
   p.parse ARGV
 end
 
 TWEET_ARCHIVE_DIR = ARGV.shift
+TWEETS_CSV_PATH = File.join(TWEET_ARCHIVE_DIR, 'tweets.csv')
 
 if @opts[:number].nil?
-  puts "\nHow many of your early tweets would you like to delete?"
-  puts "Enter a number, or 'date' to specify a date range."
-  puts "For example, '50' will delete your first 50 tweets."
+  text =  "How many tweets from your archive would you like to try to delete? e.g. entering '50' will attempt to delete the first 50 tweets listed in your archive."
+  puts ''
+  puts WordWrapper::Greedy.new(80, text).wrap
   @opts[:number] = gets.chomp.strip
-  while @opts[:number].to_i <= 0 && !@opts[:number].to_s.include?("date")
-    puts "Please specify a number greater than 0, or 'date'."
+  while @opts[:number].to_i <= 0
+    puts "Please specify a number greater than 0."
     @opts[:number] = gets.chomp.strip
   end
-  @opts[:number] = "date" if @opts[:number].to_s.include?("date")
-  @opts[:number] = @opts[:number].to_i unless @opts[:number] == "date"
+  @opts[:number] = @opts[:number].to_i
 end
 
-if @opts[:number] == "date"
-  [:"start-date", :"end-date"].each do |key|
-    if @opts[key].nil?
-      while !@opts[key].is_a?(Date)
-        begin
-          puts "\nWhat's the #{key == :"start-date" ? "start" : "end"} date? Example: 'a year ago', 'January 2009'. Tweets #{key == :"start-date" ? "before" : "after"} this date will not be deleted."
-          @opts[key] = Date::parse(Chronic::parse(gets.chomp.strip).strftime("%Y-%m-%d"))
-          puts "Great! That looks like #{@opts[key].to_s}."
-        rescue
-          puts "Error parsing date. Please try again."
-        end
-      end
-    end
-  end
-end
+#if @opts[:number].nil?
+#  text =  "How many tweets from your archive would you like to try to delete? e.g. entering '50' will attempt to delete the first 50 tweets listed in your archive. (Enter 'date' to delete by date range instead.)"
+#  puts ''
+#  puts WordWrapper::Greedy.new(80, text).wrap
+#  @opts[:number] = gets.chomp.strip
+#  while @opts[:number].to_i <= 0 && !@opts[:number].to_s.include?('date')
+#    puts "Please specify a number greater than 0, or 'date'."
+#    @opts[:number] = gets.chomp.strip
+#  end
+#  if @opts[:number].to_s =~ /date/i
+#    @opts[:number] = 'date'
+#  else
+#    @opts[:number] = @opts[:number].to_i
+#  end
+#end
 
-@total_deleted = 0
+#if @opts[:number] == 'date'
+#    [:start, :end].each do |key|
+#    if @opts[key].nil?
+#      while !@opts[key].is_a?(Date)
+#        begin
+#          puts "\nEnter #{key == :start ? 'a start' : 'an end'} date. e.g. 'a year ago', 'January 2009'."
+#          puts "Only tweets on this date and #{key == :start ? 'after' : 'before'} will be deleted."
+#          @opts[key] = Date::parse(Chronic::parse(gets.chomp.strip).strftime('%Y-%m-%d'))
+#          puts "\nThat looks like #{@opts[key].to_s}."
+#        rescue
+#          puts "Error parsing date. Please try again."
+#        end
+#      end
+#    end
+#  end
+#end
+
 
 def delete_tweets_in_file filepath
+  tweets_searched = 0
+  tweets_found = 0
+  tweets_deleted = 0
   lines = CSV.read(filepath)
-  id_index = lines.first.index("tweet_id")
-  date_index = lines.first.index("timestamp")
+  id_index = lines.first.index('tweet_id')
+  #date_index = lines.first.index('timestamp')
 
   # reverse so it's earliest tweets first
   lines[1..-1].reverse.each_with_index do |row, index|
-    date = Date.parse(row[date_index])
-    if (@opts[:number] != "date" && @total_deleted < @opts[:number]) ||
-       (@opts[:number] == "date" && (@opts[:"start-date"]...@opts[:"end-date"]).include?(date))
+    #date = Date.parse(row[date_index])
+    #if (@opts[:number] != 'date' && @total_deleted < @opts[:number]) ||
+      #(@opts[:number] == 'date' && (@opts[:start]...@opts[:end]).include?(date))
+    if (tweets_searched < @opts[:number])
       id = row[id_index]
+      puts "ID #{id}"
+      tweets_searched += 1
       begin
-            puts "Looking for tweet with ID #{id}"
-            Twitter.status(id)
-            puts "Deleting tweet with ID #{id}"
-            Twitter.status_destroy(id)
-            @total_deleted += 1
+        puts "  Searching..."
+        Twitter.status(id)
+        tweets_found += 1
+        begin
+          puts "  Deleting..."
+          Twitter.status_destroy(id)
+          tweets_deleted += 1
+        rescue
+          puts "  Error deleting tweet ID #{id}"
+        end
       rescue
-        puts "Error finding/deleting tweet with ID #{id}"
+        puts "  Couldn't find tweet ID #{id}"
       end
-      sleep 1
+      #sleep 1
     end
-    if @opts[:number] != "date" && @total_deleted == @opts[:number]
-      puts "Finished deleting #{@opts[:number]} tweets"
-      exit
-    end
+    #if @opts[:number] != 'date' && @total_deleted == @opts[:number]
+    #if @total_deleted == @opts[:number]
+    #end
   end
+  puts ''
+  puts "Summary:"
+  puts "  Searched: #{tweets_searched}"
+  puts "  Found: #{tweets_found}"
+  puts "  Deleted #{tweets_deleted}"
 end
 
-if @opts[:number] == "date"
-puts "\nThis action will PERMANENTLY delete your tweets for @#{Twitter.user.username} between #{@opts[:"start-date"]} and #{@opts[:"end-date"]}. Are you absolutely certain beyond a shadow of a doubt that you want to do this? There is no undo. (Y/n)"
-else
-  tweets_phrase = @opts[:number] > 1 ? "your first #{@opts[:number]} tweets" : "your first tweet"
-  puts "\nThis action will PERMANENTLY delete #{tweets_phrase} for @#{Twitter.user.username}. Are you absolutely certain beyond a shadow of a doubt that you want to do this? There is no undo. (Y/n)"
-end
+#if @opts[:number] == 'date'
+#  text  = "This action will PERMANENTLY delete your tweets for @#{Twitter.user.username} between #{@opts[:start]} and #{@opts[:end]} (inclusive). Are you absolutely certain beyond a shadow of a doubt that you want to do this? There is no undo."
+#  puts ''
+#  puts WordWrapper::Greedy.new(80, text).wrap
+#  puts "\nType 'yes' to confirm."
+#else
+tweets_phrase = @opts[:number] > 1 ? "the first #{@opts[:number]} tweets" : "the first tweet"
+text = "\nThis action will PERMANENTLY delete #{tweets_phrase} for @#{Twitter.user.username} listed in your archive. Are you absolutely certain beyond a shadow of a doubt that you want to do this? There is no undo."
+puts ''
+puts WordWrapper::Greedy.new(80, text).wrap
+puts "\nType 'yes' to confirm."
+#end
 confirmation = gets.chomp.strip
 
-if confirmation == "y"
-  puts "Is that a 'yes'? Just making sure."
-  confirmation = gets.chomp.strip
-end
-
-if confirmation == "Y" || confirmation == 'yes'
-  puts "Deleting tweets..."
-  Dir.glob(File.join(TWEET_ARCHIVE_DIR, "data", "csv", "*")).each do |filepath|
-    delete_tweets_in_file(filepath)
-  end
+if confirmation =~ /^yes$/i
+  puts "\nDeleting tweets..."
+  delete_tweets_in_file(TWEETS_CSV_PATH)
 else
-  puts "Canceling"
+  puts "\nYou did not type 'yes'. Canceling."
 end
