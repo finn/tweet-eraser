@@ -8,6 +8,7 @@ GEM
     multipart-post (1.2.0)
     oauth (0.4.7)
     simple_oauth (0.2.0)
+    trollop (2.0)
     twitter (4.6.2)
       faraday (~> 0.8, < 0.10)
       multi_json (~> 1.0)
@@ -20,5 +21,6 @@ PLATFORMS
 DEPENDENCIES
   chronic
   oauth
+  trollop
   twitter
   word_wrapper
