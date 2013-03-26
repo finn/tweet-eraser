@@ -1,5 +1,6 @@
-source "http://rubygems.org"
+source "https://rubygems.org"
 
 gem "twitter"
 gem "chronic"
 gem "oauth"
+gem "textwrap"
