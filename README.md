@@ -49,6 +49,7 @@ an OAuth key.
 ```
 bundle install --path vendor
 ```
+
 * Configure the script with your Twitter app authentication information. Edit
   `lib/config.rb` and add your consumer key, consumer secret, access token, and
   access token secret from dev.twitter.com
