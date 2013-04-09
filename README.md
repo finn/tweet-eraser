@@ -42,7 +42,9 @@ an OAuth key.
 
 * Install the bundled gems locally:
 
-    bundle install --path vendor
+```bash
+bundle install --path vendor
+```
 
 * Configure the script with your Twitter app authentication information. Edit
   `lib/config.rb` and add your consumer key, consumer secret, access token, and
@@ -56,4 +58,6 @@ an OAuth key.
 * Using bundler, run the `erase_tweets` script from this repo, pointing it to
   the path of your unzipped tweet archive directory:
 
-    bundle exec bin/erase_tweets /path/to/tweet/archive/dir
+```bash
+bundle exec bin/erase_tweets /path/to/tweet/archive/dir
+```
