@@ -1,27 +1,18 @@
-# shame-eraser
+# Tweet Eraser
 
-Now that Twitter has made it easy to download our entire tweet archives, the
-Internet is faced with the scary reality that the dumbest things we've ever
-said are only a few clicks away. Our early tweets were sent from a time of
-innocence, joy, and freedom from the realization that one day other people (and
-we ourselves) might pass judgement on them.
+The ability to easily download our entire tweet archive from Twitter has also
+given us the ability to identify and erase tweets from our past en masse. If
+you're the type of person who rips up your old poems this script is for you.
 
-But the time of reckoning has come. And if you're unable to bear the weight of
-your shame, this is your way out. Perhaps you had a particularly dark period
-after a break-up. Maybe your first six months on Twitter were just bad haikus.
-If you're the type of person who rips up your old shitty poems, this script is
-for you.
-
-**Important:** this should be obvious, but to be sure **there is no undo** for
-this script. If you haven't seen *Eternal Sunshine of the Spotless Mind*, you
-might want to watch it first. Weigh your options carefully before erasing your
-past. (You will, of course, still have your local archive after deleting the
-public tweets.)
+**There is no undo for this script.** Weigh your decision carefully before
+erasing your tweets. You will, of course, still have your local archive after
+deleting your tweets on Twitter.
 
 ## Author
 
-* [Benjamin Jackson](http://twitter.com/benjaminjackson)
 * [Finn Smith](http://twitter.com/finn)
+* Based on [Shame Eraser](https://github.com/benjaminjackson/shame-eraser) by
+  [Benjamin Jackson](http://twitter.com/benjaminjackson)
 
 ## Instructions:
 
